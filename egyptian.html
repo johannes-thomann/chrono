@@ -1,0 +1,220 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Egyptian Calendar (Era of Nabonassar)</title>
+
+<script language="JavaScript">
+
+
+y_jul=4716
+j_jul=1401
+m_jul=3
+n_jul=12
+r_jul=4
+p_jul=1461
+q_jul=0
+v_jul=3
+u_jul=5
+s_jul=153
+t_jul=2
+w_jul=2
+
+y_cop=4996
+j_cop=124
+m_cop=1
+n_cop=13
+r_cop=4
+p_cop=1461
+q_cop=0
+v_cop=3
+u_cop=1
+s_cop=30
+t_cop=0
+w_cop=0
+
+function intPart(floatNum){
+if (floatNum< -0.0000001){
+	 return Math.ceil(floatNum-0.0000001)
+	}
+return Math.floor(floatNum+0.0000001)	
+}
+
+function weekDay(wdn){
+					if(wdn==0){
+						return "Monday"
+						}
+					if(wdn==1){
+						return "Tuesday"
+						}
+					if(wdn==2){
+						return "Wednesday"
+						}
+					if(wdn==3){
+						return "Thursday"
+						}
+					if(wdn==4){
+						return "Friday"
+						}
+					if(wdn==5){
+						return "Saturday"
+						}
+					if(wdn==6){
+						return "Sunday"
+						}
+	return ""
+
+}
+function jul2jd(arg){
+	jul_d=parseInt(arg.JDay.value)
+	jul_m=parseInt(arg.JMonth.value)
+	jul_y=parseInt(arg.JYear.value)
+
+	jul_y_bar=jul_y + y_jul -intPart((n_jul+m_jul-1-jul_m)/n_jul)
+	jul_m_bar=(jul_m-m_jul+n_jul)%n_jul
+	jul_d_bar=jul_d-1
+	
+	c=intPart((p_jul*jul_y_bar+q_jul)/r_jul)
+	d=intPart( (s_jul*jul_m_bar+t_jul)/u_jul)
+	jd=c+d+jul_d_bar-j_jul
+	arg.JD.value=jd
+	arg.wd.value=weekDay(jd%7)
+}
+function jd2jul(arg){
+	j=parseInt(arg.JD.value)
+	arg.wd.value=weekDay(j%7)
+	jul_j_bar=j+j_jul
+	
+	jul_y_bar=intPart((r_jul*jul_j_bar+v_jul)/p_jul)
+	jul_t_bar=intPart( ((r_jul*jul_j_bar+v_jul)%p_jul)/r_jul)
+	jul_m_bar=intPart((u_jul*jul_t_bar+w_jul)/s_jul)
+	jul_d_bar=intPart( ((u_jul*jul_t_bar+w_jul)%s_jul)/u_jul)
+	jul_d=jul_d_bar+1
+	jul_m=(jul_m_bar+m_jul-1)%n_jul +1
+	jul_y=jul_y_bar-y_jul+intPart((n_jul+m_jul-1-jul_m)/n_jul)
+	arg.JDay.value=jul_d
+	arg.JMonth.value=jul_m
+	arg.JYear.value=jul_y
+}
+function jul2yaz(arg){
+	jul2jd(arg)
+	jd2yaz(arg)
+}
+function yaz2jul(arg){
+	yaz2jd(arg)
+	jd2jul(arg)
+}
+var yaz_epo1 = 1951668;
+var yaz_epo2 = 1952063;
+var epag_change = 2088938;
+
+
+function epagValue(arg) {
+    for (var i=0; i<arg.epagflag.length; i++){
+         if (arg.epagflag[i].checked) {
+             return arg.epagflag[i].value;
+         }
+    }
+    return false;
+  }
+function yaz2jd(arg){
+	d=parseInt(arg.YDay.value)
+	m=parseInt(arg.YMonth.value)
+	y=parseInt(arg.YYear.value)	
+	epagflg = parseInt(epagValue(arg));
+	yaz_ep=yaz_epo1;
+	if(m>8 && ((y<376 && epagflg==0)|| (epagflg==1))){ //if after Aban and Epagomenai after Aban
+		yaz_ep=yaz_ep + 5;								// days increased by Epagomenai
+	}
+	arg.JD.value = yaz_ep + d-1+m*30+y*365;
+}
+function jd2yaz(arg){
+	jd=parseInt(arg.JD.value);
+	epagflg = parseInt(epagValue(arg));
+	d_diff = jd-yaz_epo2;
+	y = intPart(d_diff/365)+1;
+	y_diff =d_diff-(y-1)*365;
+	epalim = 240;
+	if((jd > epag_change && epagflg==0) || (epagflg==2)){
+		epalim = 360; 
+	}
+	m = intPart((y_diff-intPart(y_diff/epalim)*5)/30)+1;
+	d = y_diff - (m-1)*30- intPart(y_diff/(epalim+5))*5+1;
+	arg.YDay.value=d;
+	arg.YMonth.value=m;
+	arg.YYear.value=y;
+	arg.JD.value=jd
+	arg.wd.value=weekDay(jd%7)
+	
+}
+var egy_epo = 1448638;
+
+function jul2egy(arg){
+	jul2jd(arg)
+	jd2egy(arg)
+}
+function egy2yul(arg){
+	egy2jd(arg)
+	jd2jul(arg)
+}
+
+function jd2egy(arg){
+	jd=parseInt(arg.JD.value);
+	d_diff = jd-egy_epo;
+	y = intPart(d_diff/365)+1;
+	y_diff =d_diff-(y-1)*365;
+	epalim = 360; 
+	m = intPart((y_diff-intPart(y_diff/epalim)*5)/30)+1;
+	d = y_diff - (m-1)*30- intPart(y_diff/(epalim+5))*5+1;
+	arg.EDay.value=d;
+	arg.EMonth.value=m;
+	arg.EYear.value=y;
+	arg.JD.value=jd
+	arg.wd.value=weekDay(jd%7)
+	
+}
+function egy2jd(arg){
+	d=parseInt(arg.EDay.value)
+	m=parseInt(arg.EMonth.value)
+	y=parseInt(arg.EYear.value)	
+	arg.JD.value = egy_epo + d-1+m*30+y*365-395;
+}
+
+</script>
+</head><body bgcolor="#70e070">
+<center><h1>Conversion of Egyptian and Julian dates (Era of Nabonassar)</h1>
+<p></p><hr><p>
+</p><form name="chrono_1">
+<center><table border="1">
+<tbody><tr><th></th><th>Day</th><th>Month</th><th>Year</th></tr>
+<tr><th>Julian</th>
+<th><input name="JDay" value="26" size="4" type="text"></th>
+<th><input name="JMonth" value="2" size="4" type="text"></th>
+<th><input name="JYear" value="-746" size="4" type="text"></th></tr>
+<tr><th>Egyptian</th>
+<th><input name="EDay" value="1" size="4" type="text"></th>
+<th><input name="EMonth" value="1" size="4" type="text"></th>
+<th><input name="EYear" value="1" size="4" type="text"></th></tr></tbody></table><p>
+<input name="j2e" value="Julian to Egyptian Date" onclick="javascript:jul2egy(this.form);" type="button">
+<input name="e2j" value="Egyptian to Julian Date" onclick="javascript:egy2yul(this.form);" type="button"></p><p>
+Day of the week:   <input name="wd" size="10" type="text"></p><p>
+Julian Day:   <input name="JD" size="10" type="text"></p><p>
+
+</p>
+<hr>
+<table border="1">
+<tbody><tr><th>1</th><th>Thoth</th><th></th><th>7</th><th>Phamenoth</th></tr>
+<tr><th>2</th><th>Phaophi</th><th></th><th>8</th><th>Pharmuti</th></tr>
+<tr><th>3</th><th>Athyr</th><th></th><th>9</th><th>Pachon</th></tr>
+<tr><th>4</th><th>Choiak</th><th></th><th>10</th><th>Payni</th></tr>
+<tr><th>5</th><th>Tybi</th><th></th><th>11</th><th>Epiphi</th></tr>
+<tr><th>6</th><th>Mechir</th><th></th><th>12</th><th>Mesore</th></tr>
+</tbody></table>
+<table>
+<tbody><tr><td><i>Epoch:</i></td><td><i>Add to year:</i></td></tr>
+<tr><td>Philippus</td><td>+424</td></tr>
+<tr><td>Augustus</td><td>+718</td></tr>
+<tr><td>Hadrian</td><td>+863</td></tr>
+<tr><td>Antoninus</td><td>+884</td></tr>
+</tbody></table>
+<hr>
+©  J. Thomann 2010<p>
+</p></center></form></center></body></html>
